@@ -13,10 +13,14 @@ public abstract class AbstractEntity {
     @GeneratedValue
     private int id;
 
-    @NotBlank
-    @Size(min = 5)
+    @NotBlank(message="Please enter employer name.")
+    @Size(min = 1, message="")
     private String name;
 
+    @Override
+    public String toString() {
+        return name;
+    }
     public int getId() {
         return id;
     }
@@ -27,11 +31,6 @@ public abstract class AbstractEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
     @Override

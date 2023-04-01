@@ -13,7 +13,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +33,6 @@ public class HomeController {
     @RequestMapping("")
     public String index(Model model) {
         model.addAttribute("title", "My Jobs");
-        // lists a hyperlink of each Job on the homepage
         model.addAttribute("jobs", jobRepository.findAll());
         return "index";
     }
@@ -50,37 +48,39 @@ public class HomeController {
 
     @PostMapping("add")
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam ArrayList<Integer> skills) {
+                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Add Job");
+            model.addAttribute("title", "Add Jobs");
             return "add";
         }
+        /*If Employer object exists its data is passed to the newJob object
+         Otherwise, a new Employer object is created and passed to the newJob object
+         */
+        Employer newEmployer = employerRepository.findById(employerId).orElse(new Employer());
+        newJob.setEmployer(newEmployer);
 
-        Optional<Employer> optEmployer = employerRepository.findById(employerId);
-        newJob.setEmployer(optEmployer.get());
         List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
         newJob.setSkills(skillObjs);
-        model.addAttribute("job", newJob);
+
         jobRepository.save(newJob);
-
+        model.addAttribute("job", jobRepository.findAll());
         return "redirect:";
-
     }
 
     @GetMapping("view/{jobId}")
-    public String displayViewJob(Model model, @PathVariable int jobId, Job job) {
+    public String displayViewJob(Model model, @PathVariable int jobId) {
 
         Optional optJob = jobRepository.findById(jobId);
         if (optJob.isPresent()) {
             //if not null, assign values from repo to Job object in contructor
-            job = (Job) optJob.get();
+            Job job = (Job) optJob.get();
             //send job data to template
             model.addAttribute("job", job);
             return "view";
         } else {
             //redirect back to the all jobs list and populate via the jobRepo
             model.addAttribute("jobs", jobRepository.findAll());
-            return "redirect";
+            return "redirect:";
         }
     }
 

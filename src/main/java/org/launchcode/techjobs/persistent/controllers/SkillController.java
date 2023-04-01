@@ -3,6 +3,8 @@ package org.launchcode.techjobs.persistent.controllers;
 import org.launchcode.techjobs.persistent.models.Employer;
 import org.launchcode.techjobs.persistent.models.Job;
 import org.launchcode.techjobs.persistent.models.Skill;
+import org.launchcode.techjobs.persistent.models.data.EmployerRepository;
+import org.launchcode.techjobs.persistent.models.data.JobRepository;
 import org.launchcode.techjobs.persistent.models.data.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,15 +22,22 @@ public class SkillController {
     @Autowired
     private SkillRepository skillRepository;
 
-    @GetMapping("/index")
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private EmployerRepository employerRepository;
+
+    @GetMapping("")
     public String index(Model model){
         model.addAttribute("skills", skillRepository.findAll());
         return "skills/index";
     }
-   @GetMapping("add")
+   @GetMapping("/add")
     public String displayAddSkillForm(Model model, Skill skill) {
-        model.addAttribute("skills", skillRepository.findAll());
-        return "skills/index";
+        model.addAttribute("title", "All Skills");
+        model.addAttribute("skill", skill);
+        return "skills/add";
     }
 
     @PostMapping("add")
@@ -38,7 +47,7 @@ public class SkillController {
             return "skills/add";
         }
         skillRepository.save(newSkill);
-        return "redirect: ";
+        return "redirect:";
     }
 
     @GetMapping("view/{skillsId}")
